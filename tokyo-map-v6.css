@@ -1,0 +1,26 @@
+.tokyo-map-v6{height:var(--tokyo-map-height,clamp(380px,58vh,620px));min-width:0;position:relative;isolation:isolate;z-index:0;background:#e8f0ed;color:var(--ink,#163b38);font-family:Pretendard,sans-serif}
+.tokyo-map-v6 .leaflet-tile-pane{filter:saturate(.48) contrast(.94)}
+.tokyo-map-v6 .leaflet-control-attribution{max-width:calc(100% - 8px);white-space:normal;background:#fffffff2;color:#28443b;font:10px/1.5 Pretendard,sans-serif;padding:2px 5px}
+.tokyo-map-v6 .leaflet-control-attribution a{color:#236e64;text-underline-offset:2px}
+.tokyo-map-v6 .leaflet-control-zoom a{width:44px;height:44px;line-height:42px;font-family:Pretendard,sans-serif;color:#163b38;background:#fff}
+.tokyo-map-v6 .leaflet-control-scale-line{background:#fffffff2;color:#28443b;font:10px/1.2 Pretendard,sans-serif}
+.tokyo-map-v6:focus-visible,.tokyo-map-v6 .leaflet-marker-icon:focus-visible,.tokyo-map-v6 .leaflet-control a:focus-visible{outline:3px solid #327baf;outline-offset:3px}
+.tokyo-map-v6 .tm6-marker{border:0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:8px}
+.tm6-pin{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:2px solid #fff;border-radius:50%;background:var(--tm6-marker);color:#fff;box-shadow:0 3px 7px #1c332a40;pointer-events:none}
+.tm6-pin svg{width:17px;height:17px;display:block}
+.tm6-pin.hotel{border-radius:8px}
+.tm6-pin.is-selected{width:36px;height:36px;border:3px solid #dfec97}
+.tm6-pin.is-focused{outline:2px solid #163b38;outline-offset:2px}
+.tm6-pin.is-approximate{border-style:dashed;background:#fff;color:var(--tm6-marker);border-color:var(--tm6-marker)}
+.tm6-pin.is-step{font:750 13px/1 Pretendard,sans-serif;font-variant-numeric:tabular-nums}
+.tm6-marker-caption{position:absolute;top:40px;left:50%;transform:translateX(-50%);display:block;max-width:220px;padding:3px 7px;border-radius:4px;background:#fff;color:#163b38;box-shadow:0 2px 6px #163b3829;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:600 11px/1.5 Pretendard,sans-serif;pointer-events:none}
+.tokyo-map-v6 .tm6-cluster{flex-direction:column}
+.tm6-cluster-count{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:2px solid #236e64;border-radius:50%;background:#fff;color:#163b38;box-shadow:0 3px 7px #1c332a2b;font:750 14px/1 Pretendard,sans-serif;font-variant-numeric:tabular-nums;pointer-events:none}
+.tm6-cluster-kinds{position:absolute;top:37px;display:flex;justify-content:center;gap:2px;pointer-events:none}
+.tm6-cluster-kinds i{display:block;width:5px;height:5px;border-radius:50%;background:var(--tm6-marker)}
+.tokyo-map-v6 .tm6-area{display:flex;justify-content:center;align-items:center;border:0;background:transparent;cursor:pointer;text-align:center;border-radius:4px}
+.tm6-area span{display:inline-block;max-width:160px;padding:3px 7px;border-radius:4px;background:#fffffff2;color:#163b38;white-space:nowrap;font:650 12px/1.6 Pretendard,sans-serif;pointer-events:none}
+.tm6-area:hover span,.tm6-area:focus-visible span{background:#236e64;color:#fff}
+.tm6-unavailable{padding:24px;font:14px/1.7 Pretendard,sans-serif;color:#516d66}
+@media(max-width:760px){.tokyo-map-v6{height:var(--tokyo-map-height,clamp(360px,55dvh,520px))}.tm6-area span{font-size:11px;padding:3px 6px}.tm6-marker-caption{max-width:180px;font-size:10px}.tokyo-map-v6 .leaflet-control-attribution{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.tokyo-map-v6.leaflet-fade-anim .leaflet-tile,.tokyo-map-v6 .leaflet-zoom-animated{transition:none}}
