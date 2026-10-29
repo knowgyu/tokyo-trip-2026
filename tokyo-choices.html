@@ -9,15 +9,19 @@
   <title>도쿄 여행 수첩 · 11월 11–14일</title>
   <link rel="preload" href="assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/leaflet/leaflet.css">
-  <link rel="stylesheet" href="tokyo-v6.css?v=6.1">
-  <link rel="stylesheet" href="tokyo-map-v6.css?v=6">
+  <link rel="stylesheet" href="tokyo-v6.css?v=7">
+  <link rel="stylesheet" href="tokyo-map-v6.css?v=7">
+  <link rel="stylesheet" href="tokyo-map-workspace-v7.css?v=7">
   <script src="assets/leaflet/leaflet.js" defer></script>
   <script src="tokyo-map-data.js?v=6" defer></script>
+  <script src="tokyo-airports-v7.js?v=7" defer></script>
+  <script src="tokyo-hotel-advice-v7.js?v=7" defer></script>
+  <script src="tokyo-recommendations-v7.js?v=7" defer></script>
   <script src="tokyo-data-v6.js?v=6" defer></script>
   <script src="tokyo-state-v6.js?v=6" defer></script>
   <script src="tokyo-planner-v6.js?v=6" defer></script>
-  <script src="tokyo-map-v6.js?v=6" defer></script>
-  <script src="tokyo-app-v6.js?v=6.1" defer></script>
+  <script src="tokyo-map-v6.js?v=7" defer></script>
+  <script src="tokyo-app-v6.js?v=7" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#workbench">본문으로 이동</a>
@@ -78,19 +82,20 @@
           <div class="catalog-kinds" id="catalog-kinds" aria-label="장소 종류"></div>
           <details id="catalog-filter-details" class="catalog-filter-details" open>
             <summary>검색·동네·메뉴 <span id="catalog-filter-count">조건 없음</span></summary>
-            <div class="catalog-fields"><label class="search-field"><span>장소 검색</span><span class="search-wrap"><span data-icon="search"></span><input type="search" id="place-search" placeholder="이름·음식·동네" autocomplete="off"></span></label><label>동네<select id="place-area"></select></label><label>종류·메뉴<select id="place-menu"></select></label><label>실내·실외<select id="place-setting"><option value="all">모두</option><option value="indoor">실내</option><option value="outdoor">산책·실외</option></select></label></div>
-            <div class="filter-second"><label class="check-chip"><input type="checkbox" id="place-recommended">취향 추천</label><label class="check-chip"><input type="checkbox" id="place-selected">담은 곳만</label><details class="advanced-filter"><summary>더 고르기 <span data-icon="chevron-down"></span></summary><div><label>사진<select id="place-photo"><option value="all">모두</option><option value="any">사진 있는 곳</option><option value="editorial">취재·여행자 사진</option></select></label><label class="check-chip"><input type="checkbox" id="map-hotels">지도에 숙소 후보도 표시</label></div></details><button class="text-button reset-filter" data-action="reset-places">초기화</button></div>
+            <div class="catalog-fields"><label class="search-field"><span>장소 검색</span><span class="search-wrap"><span data-icon="search"></span><input type="search" id="place-search" placeholder="숙소·장소·음식·동네" autocomplete="off"></span></label><label>동네<select id="place-area"></select></label><label>종류·메뉴<select id="place-menu"></select></label><label>실내·실외<select id="place-setting"><option value="all">모두</option><option value="indoor">실내</option><option value="outdoor">산책·실외</option></select></label></div>
+            <div class="filter-second"><label class="check-chip"><input type="checkbox" id="place-recommended">취향 추천</label><label class="check-chip"><input type="checkbox" id="place-selected">담은 곳만</label><details class="advanced-filter"><summary>더 고르기 <span data-icon="chevron-down"></span></summary><div><label>사진<select id="place-photo"><option value="all">모두</option><option value="any">사진 있는 곳</option><option value="editorial">취재·여행자 사진</option></select></label><label class="check-chip"><input type="checkbox" id="map-hotels" checked>숙소 후보 표시</label></div></details><button class="text-button reset-filter" data-action="reset-places">초기화</button></div>
           </details>
         </div>
         <div class="explore-result-bar"><span id="place-count" role="status" aria-live="polite" aria-atomic="true"></span><button class="text-button" data-action="show-collection">담은 곳 <span id="library-picked">0</span> <span data-icon="arrow-right"></span></button></div>
         <div id="gallery-surface"><details class="food-guide"><summary>도쿄에서 먹어볼 음식</summary><div class="food-guide-grid" id="food-guide"></div></details><div class="place-grid" id="place-grid"></div><div class="more-row"><button class="button secondary" id="more-places" data-action="more-places">장소 더 보기</button></div></div>
         <div id="map-surface">
-          <div class="map-mode-bar"><div class="segmented small" aria-label="지도 후보 범위"><button data-action="map-scope" data-value="all" aria-pressed="true">모든 후보</button><button data-action="map-scope" data-value="selected" aria-pressed="false">담은 곳</button><button data-action="map-scope" data-value="route" aria-pressed="false">날짜별 동선</button></div><div class="map-camera-actions"><button class="button plain compact" data-action="map-fit"><span data-icon="expand"></span>전체 위치</button><button class="button plain compact" data-action="map-hotel"><span data-icon="bed"></span>내 숙소</button></div></div>
+          <div class="map-hotel-filter" id="map-hotel-filter"><label>숙소 3박 합계<select id="map-hotel-budget"><option value="1000000">100만 원 이하</option><option value="800000">80만 원 이하</option><option value="600000">60만 원 이하</option><option value="all">전체 예산</option></select></label><span>성인 2명 · 객실 1개 · 11/11~14</span></div>
+          <div class="map-mode-bar"><div class="segmented small" aria-label="지도 후보 범위"><button data-action="map-scope" data-value="all" aria-pressed="true">모든 후보</button><button data-action="map-scope" data-value="selected" aria-pressed="false">담은 곳</button><button data-action="map-scope" data-value="route" aria-pressed="false">날짜별 동선</button></div><div class="map-camera-actions"><button class="button secondary compact" data-action="map-airports"><span data-icon="plane"></span>공항·숙소</button><button class="button secondary compact" data-action="map-fit"><span data-icon="expand"></span>도쿄 시내</button></div></div>
           <div class="route-controls" id="route-controls" hidden><label>방문일<select id="route-day"></select></label><a href="#plan" class="text-button">시간표로 돌아가기 <span data-icon="arrow-right"></span></a><p id="route-status"></p></div>
           <div class="mobile-map-switch segmented" aria-label="모바일 지도 화면"><button data-action="map-mobile" data-value="map" aria-pressed="true">지도</button><button data-action="map-mobile" data-value="list" aria-pressed="false">목록</button></div>
           <div class="map-workspace" id="map-workspace" data-mobile="map">
             <aside class="map-results" aria-label="지도와 같은 후보 목록"><div class="map-area-copy" id="map-area-copy"></div><div id="map-results-list"></div><button class="button secondary" data-action="more-map" id="more-map">후보 더 보기</button></aside>
-            <div class="map-stage"><div id="tokyo-map-canvas"></div><div id="map-peek" class="map-peek" hidden></div><div class="map-key"><span><i class="key-dot hotel"></i>숙소</span><span><i class="key-dot food"></i>식당</span><span><i class="key-dot cafe"></i>카페</span><span><i class="key-dot spot"></i>명소</span><span id="map-base"></span></div></div>
+            <div class="map-stage"><div id="map-contextbar" class="map-contextbar" aria-label="공항과 숙소 바로 보기"></div><div id="tokyo-map-canvas"></div><div id="map-peek" class="map-peek" hidden></div><div class="map-key"><span><i class="key-dot airport"></i>공항</span><span><i class="key-dot hotel"></i>숙소</span><span><i class="key-dot food"></i>식당</span><span><i class="key-dot cafe"></i>카페</span><span><i class="key-dot spot"></i>명소</span><span id="map-base"></span></div></div>
           </div>
           <details class="source-note map-source-note"><summary>위치와 동선 표시 기준</summary><p>시설 좌표를 확인한 곳은 핀으로 표시해. 좌표 미확인 후보는 목록에 ‘동네 기준’으로 적었어. 선은 방문 순서이며 실제 도로·철도 경로는 시간표의 길찾기에서 볼 수 있어.</p></details>
         </div>

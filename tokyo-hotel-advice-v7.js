@@ -1,0 +1,49 @@
+// Official room-type and location advice checked on 2026-10-29.
+// Does not replace the 2026-10-28 hotel quote, room-size, or review fields.
+const TOKYO_HOTEL_ADVICE = {
+  "via-ningyocho": {
+    "summary": "일본식 식당 골목을 걷고 넉넉한 트윈에서 쉬기 좋아. 중심부와 아사쿠사를 나눠 다니기 편해.",
+    "roomNotes": [
+      "공식 디럭스 트윈은 21㎡·100cm 침대 2개를 붙인 배치야.",
+      "욕실과 화장실이 분리돼 있어. 예약 객실 유형을 맞춰 봐."
+    ],
+    "accessNote": "닌교초역 A6 도보 3분이야. 공항 직통편 중 에어포트쾌특은 통과하니 정차역을 봐.",
+    "sources": [
+      { "label": "비아 인 공식 객실", "url": "https://www.viainn.com/en/nihonbashi-n/room/" },
+      { "label": "비아 인 공식 교통", "url": "https://www.viainn.com/en/nihonbashi-n/access/" },
+      { "label": "GO TOKYO 아마자케요코초", "url": "https://www.gotokyo.org/en/spot/167/index.html" },
+      { "label": "도에이 닌교초 정차 안내", "url": "https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A14SD.html" }
+    ],
+    "checked": "2026-10-29"
+  },
+  "cocone-kuramae": {
+    "summary": "카페와 스미다강 산책을 즐기기 좋아. 아사쿠사까지 걸어 다니고 숙박비도 아끼고 싶을 때 추천해.",
+    "roomNotes": [
+      "공식 스탠다드 더블은 13㎡야. 둘이 짐 펼칠 공간은 작아.",
+      "객실은 유닛 배스야. 무료 대욕장은 숙박객 공용 시설이야."
+    ],
+    "accessNote": "오에도선 구라마에 1분·아사쿠사선 4분이야. 공항편은 구라마에 정차 여부를 봐.",
+    "sources": [
+      { "label": "토세이 공식 객실", "url": "https://tosei-hotel.co.jp/asakusakuramae/rooms/" },
+      { "label": "토세이 공식 대욕장", "url": "https://tosei-hotel.co.jp/asakusakuramae/spa/" },
+      { "label": "토세이 공식 위치·시설", "url": "https://tosei-hotel.co.jp/asakusakuramae/access/" },
+      { "label": "GO TOKYO 구라마에 산책 지도", "url": "https://www.gotokyo.org/book/wp-content/uploads/2023/09/2309_asakusabasi_low_EN.pdf" },
+      { "label": "도에이 구라마에 정차 안내", "url": "https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A17SD.html" }
+    ],
+    "checked": "2026-10-29"
+  },
+  "monday": {
+    "summary": "센소지 아침·저녁 산책을 자주 하고 싶을 때 좋아. 아사쿠사에 오래 머물며 트윈룸을 쓰는 선택이야.",
+    "roomNotes": [
+      "공식 스탠다드 트윈은 17.71㎡·싱글침대 2개야.",
+      "욕실은 샤워부스야. 조회 견적과 같은 유형인지 확인해."
+    ],
+    "accessNote": "TX 아사쿠사역 A1 도보 약 6분이야. 나리타 직통의 도에이 아사쿠사역과는 위치가 달라.",
+    "sources": [
+      { "label": "MONday 공식 객실", "url": "https://hotel-monday.com/en/asakusa/?name=room" },
+      { "label": "MONday 공식 교통", "url": "https://hotel-monday.com/en/asakusa/access/" },
+      { "label": "센소지 공식 저녁 조명", "url": "https://www.senso-ji.jp/info/lightup.html" }
+    ],
+    "checked": "2026-10-29"
+  }
+};

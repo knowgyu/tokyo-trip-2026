@@ -3,12 +3,14 @@
   'use strict';
 
   const HOME_BOUNDS = [[35.633, 139.681], [35.748, 139.827]];
+  const HOME_CENTER = [(HOME_BOUNDS[0][0] + HOME_BOUNDS[1][0]) / 2, (HOME_BOUNDS[0][1] + HOME_BOUNDS[1][1]) / 2];
   const DAY_COLORS = ['#73559b', '#236e64', '#386b98', '#aa512d'];
   const MAIN_AREAS = new Set(['ginza', 'asakusa', 'ueno', 'shibuya', 'aoyama', 'shinjuku', 'marunouchi', 'kiyo', 'komagome']);
   const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
   const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
   const svg = paths => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
   const KINDS = {
+    airport: {name: '공항', color: '#315a70', icon: svg('<path d="M12 2c-1.1 0-2 1.2-2 2.5V8l-7 4v3l7-2v5l-3 2v2l5-1 5 1v-2l-3-2v-5l7 2v-3l-7-4V4.5C14 3.2 13.1 2 12 2Z"/>')},
     hotel: {name: '숙소', color: '#73559b', icon: svg('<path d="M3 20V7h18v13M3 14h18M7 10h3v4H7m7-4h3v4h-3"/>')},
     food: {name: '식당', color: '#aa512d', icon: svg('<path d="M5 3v6m3-6v6m3-6v6M5 7h6m-3 2v12M19 3c-3 3-3 8 0 9v9m0-18v9"/>')},
     cafe: {name: '카페', color: '#386b98', icon: svg('<path d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zm12 1h2a3 3 0 0 1 0 6h-2M7 3v3m5-3v3M3 22h15"/>')},
@@ -36,7 +38,7 @@
     let viewportSignature = '';
     let clusterFocusKey = null;
     let routeLayer = null;
-    let model = {entries: [], selectedKeys: new Set(), hotelKey: null, hotelEntry: null, focusedKey: null, route: null, mode: 'all'};
+    let model = {entries: [], airports: [], selectedKeys: new Set(), hotelKey: null, hotelEntry: null, focusedKey: null, route: null, mode: 'all'};
     const cache = new Map();
     const markerRecords = new Map();
     const areaRecords = new Map();
@@ -55,6 +57,9 @@
       if (entry) cache.set(entry.key, entry);
       return entry;
     }
+
+    const isPrecise = entry => entry.kind === 'airport' || entry.geo.precision === 'venue' || entry.geo.precision === 'airport';
+    const airportCode = entry => String(entry.code || entry.iata || entry.id || entry.key.split(':').at(-1)).toUpperCase();
 
     function selectedHotel() {
       if (!model.hotelKey) return null;
@@ -91,7 +96,7 @@
 
     function makeMap() {
       if (map || !L) return;
-      map = L.map(host, {scrollWheelZoom: false, keyboard: true, zoomControl: false, minZoom: 10, maxZoom: 18, zoomSnap: 0.25, zoomAnimation: !reducedMotion(), fadeAnimation: !reducedMotion(), markerZoomAnimation: !reducedMotion()});
+      map = L.map(host, {scrollWheelZoom: false, keyboard: true, zoomControl: false, minZoom: 8, maxZoom: 18, zoomSnap: 0.25, zoomAnimation: !reducedMotion(), fadeAnimation: !reducedMotion(), markerZoomAnimation: !reducedMotion()});
       map.setView([35.69, 139.753], 12.25, {animate: false});
       map.createPane('tokyoV6Regions');
       map.getPane('tokyoV6Regions').style.zIndex = '350';
@@ -111,17 +116,18 @@
 
     function markerDescriptor(entry, {step = null, dayIndex = null, hotel = false} = {}) {
       const kind = KINDS[entry.kind];
-      const selected = hotel || model.selectedKeys.has(entry.key);
-      const approximate = entry.geo.precision !== 'venue';
+      const airport = entry.kind === 'airport';
+      const selected = hotel || airport || model.selectedKeys.has(entry.key);
+      const approximate = !isPrecise(entry);
       const focused = model.focusedKey === entry.key;
       const color = dayIndex === null ? kind.color : DAY_COLORS[((dayIndex % DAY_COLORS.length) + DAY_COLORS.length) % DAY_COLORS.length];
-      const caption = approximate ? entry.name + ' · 동네 기준' : hotel ? '숙소 · ' + entry.name : '';
+      const caption = airport ? airportCode(entry) : approximate ? entry.name + ' · 동네 기준' : hotel ? '숙소 · ' + entry.name : '';
       const classes = ['tm6-pin', entry.kind, selected ? 'is-selected' : '', focused ? 'is-focused' : '', approximate ? 'is-approximate' : '', step !== null ? 'is-step' : ''].filter(Boolean).join(' ');
-      const label = [entry.name, kind.name, step !== null ? (dayIndex + 1) + '일차 ' + step + '번째 방문' : '', selected ? '담은 곳' : '', approximate ? '동네 기준 위치' : '', '상세 보기'].filter(Boolean).join(' · ');
+      const label = [airport ? airportCode(entry) : '', entry.name, kind.name, step !== null ? (dayIndex + 1) + '일차 ' + step + '번째 방문' : '', selected && !airport ? '담은 곳' : '', approximate ? '동네 기준 위치' : '', '상세 보기'].filter(Boolean).join(' · ');
       return {
-        id: entry.key, entry, point: entry.geo.point, zIndex: hotel ? 1600 : focused ? 1500 : selected ? 1100 : 400,
+        id: entry.key, entry, point: entry.geo.point, zIndex: airport ? (focused ? 1800 : 1700) : hotel ? 1600 : focused ? 1500 : selected ? 1100 : 400,
         className: 'tm6-marker', label,
-        html: '<span class="' + classes + '" style="--tm6-marker:' + color + '">' + (step === null ? kind.icon : '<span>' + step + '</span>') + '</span>' + (caption ? '<span class="tm6-marker-caption">' + escapeHTML(caption) + '</span>' : ''),
+        html: '<span class="' + classes + '" style="--tm6-marker:' + color + '">' + (step === null ? kind.icon : '<span>' + step + '</span>') + '</span>' + (caption ? '<span class="tm6-marker-caption' + (airport ? ' tm6-airport-caption' : '') + '">' + escapeHTML(caption) + '</span>' : ''),
         onClick: event => onFocus?.(entry.key, {keyboard: keyboardEvent(event)})
       };
     }
@@ -142,9 +148,9 @@
 
     function ordinaryDescriptors(hotel) {
       const descriptors = [];
-      const candidates = model.entries.filter(entry => entry.geo.precision === 'venue' && entry.key !== hotel?.key);
+      const candidates = model.entries.filter(entry => entry.kind !== 'airport' && isPrecise(entry) && entry.key !== hotel?.key);
       const groupedKeys = new Set();
-      const standalone = entry => model.selectedKeys.has(entry.key) || model.focusedKey === entry.key || map.getZoom() >= 16.25;
+      const standalone = entry => model.focusedKey === entry.key || map.getZoom() >= 16.25 || map.getZoom() >= 11.25 && model.selectedKeys.has(entry.key) || markerRecords.get(entry.key)?.marker.getElement() === document.activeElement;
       for (const entry of candidates) {
         if (groupedKeys.has(entry.key)) continue;
         if (standalone(entry)) {
@@ -158,7 +164,7 @@
         descriptors.push(group.length > 1 ? clusterDescriptor(group) : markerDescriptor(entry));
       }
       const approximate = cache.get(model.focusedKey);
-      if (approximate?.geo.precision !== 'venue' && approximate && approximate.key !== hotel?.key) descriptors.push(markerDescriptor(approximate));
+      if (approximate && !isPrecise(approximate) && approximate.key !== hotel?.key) descriptors.push(markerDescriptor(approximate));
       return descriptors;
     }
 
@@ -168,15 +174,15 @@
       for (const day of model.route?.days || []) {
         const dayIndex = Number.isInteger(day.index) ? day.index : 0;
         const entries = Array.isArray(day.entries) ? day.entries.map(rememberEntry).filter(Boolean) : [];
-        let segment = hotel?.geo.precision === 'venue' ? [hotel.geo.point] : [];
+        let segment = hotel && isPrecise(hotel) ? [hotel.geo.point] : [];
         const drawSegment = () => {
           if (segment.length > 1) L.polyline(segment, {pane: 'tokyoV6Routes', color: DAY_COLORS[((dayIndex % DAY_COLORS.length) + DAY_COLORS.length) % DAY_COLORS.length], weight: 3, dashArray: '6 7', opacity: 0.75, interactive: false}).addTo(routeLayer);
         };
         entries.forEach((entry, index) => {
-          if (entry.geo.precision === 'venue') segment.push(entry.geo.point);
+          if (isPrecise(entry)) segment.push(entry.geo.point);
           else { drawSegment(); segment = []; }
-          if (entry.key === hotel?.key || used.has(entry.key)) return;
-          if (entry.geo.precision !== 'venue' && model.focusedKey !== entry.key) return;
+          if (entry.kind === 'airport' || entry.key === hotel?.key || used.has(entry.key)) return;
+          if (!isPrecise(entry) && model.focusedKey !== entry.key) return;
           descriptors.push(markerDescriptor(entry, {step: index + 1, dayIndex}));
           used.add(entry.key);
         });
@@ -228,11 +234,12 @@
       const zoom = map.getZoom();
       const wanted = new Set();
       if (zoom < 14.1) {
-        for (const [id, area] of Object.entries(data.areas || {})) {
-          if (!Array.isArray(area.point) || zoom < 13.2 && !MAIN_AREAS.has(id)) continue;
+        const labels = zoom < 11.25 ? [['all', {name: '도쿄 도심', point: HOME_CENTER}]] : Object.entries(data.areas || {});
+        for (const [id, area] of labels) {
+          if (!Array.isArray(area.point) || zoom >= 11.25 && zoom < 13.2 && !MAIN_AREAS.has(id)) continue;
           wanted.add(id);
           if (areaRecords.has(id)) continue;
-          const label = L.marker(area.point, {pane: 'tokyoV6Regions', keyboard: true, title: area.name + ' 주변 보기', icon: L.divIcon({className: 'tm6-area', html: '<span>' + escapeHTML(area.name) + '</span>', iconSize: [140, 32], iconAnchor: [70, 16]})}).addTo(map);
+          const label = L.marker(area.point, {pane: 'tokyoV6Regions', keyboard: true, title: area.name + ' 주변 보기', icon: L.divIcon({className: 'tm6-area' + (id === 'all' ? ' tm6-city' : ''), html: '<span>' + escapeHTML(area.name) + '</span>', iconSize: [140, 32], iconAnchor: [70, 16]})}).addTo(map);
           label.on('click', () => onArea?.(id));
           const element = label.getElement();
           element?.setAttribute('role', 'button');
@@ -255,7 +262,8 @@
       routeLayer.clearLayers();
       const hotel = selectedHotel();
       const descriptors = model.mode === 'route' ? routeDescriptors(hotel) : ordinaryDescriptors(hotel);
-      if (hotel && (hotel.geo.precision === 'venue' || model.focusedKey === hotel.key)) descriptors.push(markerDescriptor(hotel, {hotel: true}));
+      if (hotel && (isPrecise(hotel) || model.focusedKey === hotel.key)) descriptors.push(markerDescriptor(hotel, {hotel: true}));
+      for (const airport of model.airports) descriptors.push(markerDescriptor(airport));
       syncMarkers(descriptors);
       syncAreas();
       if (clusterFocusKey) { focusMarkerElement(clusterFocusKey); clusterFocusKey = null; }
@@ -264,6 +272,13 @@
     function applyView(action) {
       if (action.type === 'home') map.fitBounds(HOME_BOUNDS, {padding: [24, 24], maxZoom: 12.6, animate: false});
       else if (action.type === 'focus') map.setView(action.point, action.zoom, {animate: false});
+      else if (action.type === 'airports') {
+        if (model.airports.length) {
+          const points = model.airports.map(entry => entry.geo.point);
+          points.push(selectedHotel()?.geo.point || HOME_CENTER);
+          map.fitBounds(points, {padding: [54, 54], maxZoom: 11, animate: false});
+        } else map.fitBounds(HOME_BOUNDS, {padding: [24, 24], maxZoom: 12.6, animate: false});
+      }
       else if (action.type === 'entries') {
         if (action.points.length) map.fitBounds(action.points, {padding: [42, 42], maxZoom: 15.5, animate: false});
         else map.fitBounds(HOME_BOUNDS, {padding: [24, 24], maxZoom: 12.6, animate: false});
@@ -337,8 +352,10 @@
       render(next = {}) {
         if (destroyed) return;
         const entries = Array.isArray(next.entries) ? next.entries.map(rememberEntry).filter(Boolean) : [];
+        const airports = new Map((Array.isArray(next.airports) ? next.airports : model.airports).map(raw => rememberEntry({...raw, kind: 'airport'})).filter(Boolean).map(entry => [entry.key, entry]));
+        for (const entry of entries) if (entry.kind === 'airport') airports.set(entry.key, entry);
         const hotelEntry = rememberEntry(next.hotelEntry || next.route?.hotelEntry);
-        model = {entries, selectedKeys: new Set(next.selectedKeys || []), hotelKey: next.hotelKey || hotelEntry?.key || null, hotelEntry, focusedKey: next.focusedKey || null, route: next.route || null, mode: ['all', 'selected', 'route'].includes(next.mode) ? next.mode : 'all'};
+        model = {entries, airports: [...airports.values()], selectedKeys: new Set(next.selectedKeys || []), hotelKey: next.hotelKey || hotelEntry?.key || null, hotelEntry, focusedKey: next.focusedKey || null, route: next.route || null, mode: ['all', 'selected', 'route'].includes(next.mode) ? next.mode : 'all'};
         schedule();
       },
       focus(key, {zoom = false} = {}) {
@@ -346,10 +363,11 @@
         const entry = cache.get(key) || (selectedHotel()?.key === key ? selectedHotel() : null);
         if (!entry) return;
         model.focusedKey = key;
-        if (zoom) pendingView = {type: 'focus', point: entry.geo.point, zoom: entry.geo.precision === 'venue' ? 15.5 : 14};
+        if (zoom) pendingView = {type: 'focus', point: entry.geo.point, zoom: entry.kind === 'airport' || entry.geo.precision === 'airport' ? 12.5 : isPrecise(entry) ? 15.5 : 14};
         schedule();
       },
       fitAll() { if (!destroyed) { pendingView = {type: 'home'}; schedule(); } },
+      fitAirports() { if (!destroyed) { pendingView = {type: 'airports'}; schedule(); } },
       fitEntries(entries) {
         if (destroyed) return;
         pendingView = {type: 'entries', points: (Array.isArray(entries) ? entries : []).map(rememberEntry).filter(Boolean).map(entry => entry.geo.point)};
