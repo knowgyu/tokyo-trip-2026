@@ -157,6 +157,8 @@
   function mapController(){if(!controller)controller=TokyoMapV6.create({host:$('tokyo-map-canvas'),data:TOKYO_MAP_DATA,onFocus:(key,meta)=>{ui.focusedKey=key;renderPeek();highlightMapRow();if(meta.keyboard)requestAnimationFrame(()=>$('peek-title')?.focus({preventScroll:true}));},onArea:area=>{ui.place.area=area;$('place-area').value=area;resetPlaceLimits();saveUI();renderExplore();fitArea(area);}});return controller;}
   function highlightMapRow(){document.querySelectorAll('.map-entry').forEach(e=>e.classList.toggle('focused',e.querySelector('[data-key]')?.dataset.key===ui.focusedKey));}
   function renderExplore(){const list=catalogList();$('catalog-count').textContent=`명소 ${TOKYO.items.filter(p=>p.kind==='spot').length} · 식당 ${TOKYO.items.filter(p=>p.kind==='food').length} · 카페 ${TOKYO.items.filter(p=>p.kind==='cafe').length}`;$('place-count').textContent=`${list.length}곳${ui.scope==='route'?' · 시간표의 방문지':ui.scope==='selected'?' · 담은 곳':''}`;$('library-picked').textContent=state.selected.length;
+    const filterCount=[ui.place.query.trim(),ui.place.area!=='all',ui.place.menu!=='all',ui.place.setting!=='all',ui.place.recommended,ui.place.photo!=='all',ui.showHotels].filter(Boolean).length;
+    $('catalog-filter-count').textContent=filterCount?`조건 ${filterCount}개 적용`:'조건 없음';
     document.querySelectorAll('[data-action="surface"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.value===ui.surface));document.querySelectorAll('[data-action="map-scope"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.value===ui.scope));
     $('gallery-surface').hidden=ui.surface!=='gallery';$('map-surface').hidden=ui.surface!=='map';document.querySelector('.map-camera-actions').hidden=ui.surface!=='map';$('route-controls').hidden=ui.scope!=='route';$('route-day').value=ui.routeDay;
     $('route-status').textContent=ui.scope==='route'?(!state.plan?'시간표를 먼저 만들어줘.':isStale()?'선택이 바뀌었어. 시간표를 다시 만들면 동선이 보여.':''):'';
@@ -340,7 +342,7 @@
   window.addEventListener('popstate',handleNativeNavigation);window.addEventListener('hashchange',handleNativeNavigation);window.addEventListener('beforeprint',preparePrint);
   const summaryViewport=matchMedia('(max-width:760px)'),mapViewport=matchMedia('(max-width:1000px)');
   const watchMedia=(query,listener)=>{if(query.addEventListener)query.addEventListener('change',listener);else query.addListener(listener);};
-  watchMedia(summaryViewport,event=>{$('trip-summary').open=!event.matches;});
+  watchMedia(summaryViewport,event=>{$('trip-summary').open=!event.matches;$('catalog-filter-details').open=!event.matches;});
   watchMedia(mapViewport,()=>{if(ui.view==='explore'&&ui.surface==='map')renderExplore();});
 
   function init(){restoreUI();
@@ -352,6 +354,7 @@
     $('place-selected').closest('label').remove();
     $('food-guide').innerHTML=TOKYO.foodGuide.map(g=>`<button class="food-choice" data-action="food" data-value="${esc(g.filter)}"><strong>${esc(g.name)}</strong><small>${esc(g.text)}</small></button>`).join('');
     if(summaryViewport.matches)$('trip-summary').open=false;
+    $('catalog-filter-details').open=!summaryViewport.matches;
     if(mapViewport.matches&&restored.hadPlan)$('collection-details').open=false;
     syncHotelControls();syncPlaceControls();
     if(restored.hadPlan&&state.flight&&state.hotel&&state.selected.length){const p=createTokyoPlan(state,TOKYO);if(!p.error){state.plan=p;state.dayOrder=p.dayOrder||{};}}

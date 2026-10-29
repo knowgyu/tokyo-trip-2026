@@ -9,7 +9,7 @@
   <title>도쿄 여행 수첩 · 11월 11–14일</title>
   <link rel="preload" href="assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/leaflet/leaflet.css">
-  <link rel="stylesheet" href="tokyo-v6.css?v=6">
+  <link rel="stylesheet" href="tokyo-v6.css?v=6.1">
   <link rel="stylesheet" href="tokyo-map-v6.css?v=6">
   <script src="assets/leaflet/leaflet.js" defer></script>
   <script src="tokyo-map-data.js?v=6" defer></script>
@@ -17,7 +17,7 @@
   <script src="tokyo-state-v6.js?v=6" defer></script>
   <script src="tokyo-planner-v6.js?v=6" defer></script>
   <script src="tokyo-map-v6.js?v=6" defer></script>
-  <script src="tokyo-app-v6.js?v=6" defer></script>
+  <script src="tokyo-app-v6.js?v=6.1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#workbench">본문으로 이동</a>
@@ -76,8 +76,11 @@
         <div class="panel-heading"><div><h2 id="explore-title" tabindex="-1">가고 싶은 도쿄를 담아두기</h2><p id="catalog-count"></p></div><div class="segmented" aria-label="장소 보기 방식"><button data-action="surface" data-value="gallery" aria-pressed="false"><span data-icon="grid"></span>사진</button><button data-action="surface" data-value="map" aria-pressed="true"><span data-icon="map"></span>지도</button></div></div>
         <div class="explore-filters filter-panel">
           <div class="catalog-kinds" id="catalog-kinds" aria-label="장소 종류"></div>
-          <div class="catalog-fields"><label class="search-field"><span>장소 검색</span><span class="search-wrap"><span data-icon="search"></span><input type="search" id="place-search" placeholder="이름·음식·동네" autocomplete="off"></span></label><label>동네<select id="place-area"></select></label><label>종류·메뉴<select id="place-menu"></select></label><label>실내·실외<select id="place-setting"><option value="all">모두</option><option value="indoor">실내</option><option value="outdoor">산책·실외</option></select></label></div>
-          <div class="filter-second"><label class="check-chip"><input type="checkbox" id="place-recommended">취향 추천</label><label class="check-chip"><input type="checkbox" id="place-selected">담은 곳만</label><details class="advanced-filter"><summary>더 고르기 <span data-icon="chevron-down"></span></summary><div><label>사진<select id="place-photo"><option value="all">모두</option><option value="any">사진 있는 곳</option><option value="editorial">취재·여행자 사진</option></select></label><label class="check-chip"><input type="checkbox" id="map-hotels">지도에 숙소 후보도 표시</label></div></details><button class="text-button reset-filter" data-action="reset-places">초기화</button></div>
+          <details id="catalog-filter-details" class="catalog-filter-details" open>
+            <summary>검색·동네·메뉴 <span id="catalog-filter-count">조건 없음</span></summary>
+            <div class="catalog-fields"><label class="search-field"><span>장소 검색</span><span class="search-wrap"><span data-icon="search"></span><input type="search" id="place-search" placeholder="이름·음식·동네" autocomplete="off"></span></label><label>동네<select id="place-area"></select></label><label>종류·메뉴<select id="place-menu"></select></label><label>실내·실외<select id="place-setting"><option value="all">모두</option><option value="indoor">실내</option><option value="outdoor">산책·실외</option></select></label></div>
+            <div class="filter-second"><label class="check-chip"><input type="checkbox" id="place-recommended">취향 추천</label><label class="check-chip"><input type="checkbox" id="place-selected">담은 곳만</label><details class="advanced-filter"><summary>더 고르기 <span data-icon="chevron-down"></span></summary><div><label>사진<select id="place-photo"><option value="all">모두</option><option value="any">사진 있는 곳</option><option value="editorial">취재·여행자 사진</option></select></label><label class="check-chip"><input type="checkbox" id="map-hotels">지도에 숙소 후보도 표시</label></div></details><button class="text-button reset-filter" data-action="reset-places">초기화</button></div>
+          </details>
         </div>
         <div class="explore-result-bar"><span id="place-count" role="status" aria-live="polite" aria-atomic="true"></span><button class="text-button" data-action="show-collection">담은 곳 <span id="library-picked">0</span> <span data-icon="arrow-right"></span></button></div>
         <div id="gallery-surface"><details class="food-guide"><summary>도쿄에서 먹어볼 음식</summary><div class="food-guide-grid" id="food-guide"></div></details><div class="place-grid" id="place-grid"></div><div class="more-row"><button class="button secondary" id="more-places" data-action="more-places">장소 더 보기</button></div></div>
